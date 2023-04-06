@@ -76,10 +76,11 @@ function optionChanged(value) {
             });
 
             if (plotly_initialized) {
-                rePlotData();
+                rePlotData(metadata);
             } else {
                 plotly_initialized = true;
                 plotData();
+                plotGauge(metadata);
             }
         }
     } else {
@@ -124,14 +125,29 @@ function plotBubbleData() {
     Plotly.newPlot("bubble", data);
 }
 
-function rePlotData() {
-  Plotly.restyle("bar", "x", [bar_x]);
-  Plotly.restyle("bar", "y", [bar_y]);
-  Plotly.restyle("bar", "text", [bar_text]);
+function rePlotData(metadata) {
+    Plotly.restyle("bar", "x", [bar_x]);
+    Plotly.restyle("bar", "y", [bar_y]);
+    Plotly.restyle("bar", "text", [bar_text]);
 
-  Plotly.restyle("bubble", "x", [data_x]);
-  Plotly.restyle("bubble", "y", [data_y]);
-  Plotly.restyle("bubble", "text", [data_text]);
-  Plotly.restyle("bubble", "marker.size", [data_size]);
-  Plotly.restyle("bubble", "marker.color", [data_color]);
+    Plotly.restyle("bubble", "x", [data_x]);
+    Plotly.restyle("bubble", "y", [data_y]);
+    Plotly.restyle("bubble", "text", [data_text]);
+    Plotly.restyle("bubble", "marker.size", [data_size]);
+    Plotly.restyle("bubble", "marker.color", [data_color]);
+
+    var needleShape = recalculateNeedleShape(metadata.wfreq);
+    Plotly.relayout(
+        "gauge",
+        {
+            shapes:[needleShape]
+        }
+    );
+    Plotly.restyle(
+        "gauge",
+        {
+            "text": metadata.wfreq
+        },
+        [0]
+    );
 }
