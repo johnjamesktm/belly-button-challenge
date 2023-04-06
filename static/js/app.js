@@ -7,6 +7,12 @@ let bar_x = null;
 let bar_y = null;
 let bar_text = null;
 
+let data_x = null;
+let data_y = null;
+let data_text = null;
+let data_size = null;
+let data_color = null;
+
 d3.json(sample_url).then((data) => {
     sample_data = data;
     loadTestSubjectIds();
@@ -40,6 +46,18 @@ function optionChanged(value) {
 
         var selected_sample_data = sample_data.samples.find((data) => data.id == value);
         if (null != selected_sample_data) {
+            data_x = [];
+            data_y = [];
+            data_text = [];
+            data_size = [];
+            data_color = [];
+
+            selected_sample_data.otu_ids.forEach((data) => data_x.push(data));
+            selected_sample_data.sample_values.forEach((data) => data_y.push(data));
+            selected_sample_data.otu_labels.forEach((data) => data_text.push(data));
+            selected_sample_data.sample_values.forEach((data) => data_size.push(5.6 * Math.sqrt(data)));
+            selected_sample_data.otu_ids.forEach((data) => data_color.push(data));
+
             var sample_values_copy = [];
             selected_sample_data.sample_values.forEach((data, i) => sample_values_copy.push([data, i]));
 
@@ -70,6 +88,11 @@ function optionChanged(value) {
 }
 
 function plotData() {
+    plotBarData();
+    plotBubbleData();
+}
+
+function plotBarData() {
     let trace = {
         x: bar_x,
         y: bar_y,
@@ -83,8 +106,32 @@ function plotData() {
     Plotly.newPlot("bar", data);
 }
 
+function plotBubbleData() {
+    let trace = {
+        x: data_x,
+        y: data_y,
+        text: data_text,
+        mode: "markers",
+        marker: {
+            size: data_size,
+            color: data_color,
+            colorscale: 'Earth'
+        }
+    };
+
+    let data = [trace];
+
+    Plotly.newPlot("bubble", data);
+}
+
 function rePlotData() {
   Plotly.restyle("bar", "x", [bar_x]);
   Plotly.restyle("bar", "y", [bar_y]);
   Plotly.restyle("bar", "text", [bar_text]);
+
+  Plotly.restyle("bubble", "x", [data_x]);
+  Plotly.restyle("bubble", "y", [data_y]);
+  Plotly.restyle("bubble", "text", [data_text]);
+  Plotly.restyle("bubble", "marker.size", [data_size]);
+  Plotly.restyle("bubble", "marker.color", [data_color]);
 }
