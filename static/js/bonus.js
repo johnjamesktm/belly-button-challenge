@@ -19,7 +19,7 @@ for (var i = 0; i < gauge_marker_colors.length - 1; ++i) {
     range_values.push(1);
     range_labels.push(i + "-" + (i + 1));
 }
-range_values.push(range_values.length);
+range_values.push(gauge_marker_colors.length - 1);
 range_labels.push("");
 
 function plotGauge(metadata) {
@@ -71,6 +71,11 @@ function plotGauge(metadata) {
     }
 
     Plotly.newPlot("gauge", data, layout);
+    document.getElementById("gauge").on("plotly_hover", (data) => {
+        if (data.points[0].value == (gauge_marker_colors.length - 1)) {
+            Plotly.Fx.unhover("gauge");
+        }
+    });
 }
 
 function recalculateNeedleShape(level) {
